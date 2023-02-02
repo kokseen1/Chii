@@ -55,7 +55,7 @@ class Chii:
 
         self.parse_query = None
         self.craft_message = None
-        self.get_image = None
+        self.get_image = lambda: None
         self.get_key = None
 
         self.bot = telegram.Bot(bot_token)
@@ -132,9 +132,13 @@ class Chii:
         """
 
         message = self.craft_message(result)
+        if message is None:
+            return
 
-        if self.get_image:
-            _send_image(self.bot, chat_id, message, self.get_image(result))
+        image_url = self.get_image(result)
+
+        if image_url is not None:
+            _send_image(self.bot, chat_id, message, image_url)
         else:
             _send_message(self.bot, chat_id, message)
 
@@ -158,7 +162,7 @@ class Chii:
                 for result in results:
                     key = self.get_key(result)
 
-                    if key in queried:
+                    if key is None or key in queried:
                         continue
 
                     self._send(chat_id, result)

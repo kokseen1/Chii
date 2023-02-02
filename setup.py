@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="Chii",
-    version="1.0.2",
+    version="1.1.2",
     packages=["chii"],
     description="A minimal marketplace bot maker.",
     long_description=long_description,
