@@ -50,7 +50,7 @@ def _get_message_data(update):
 
 class Chii:
     def __init__(self, bot_token) -> None:
-        self.db_path = Path.cwd() / "db.json"
+        self.db_path = Path.cwd() / "chii_db.json"
         self.lock = Lock()
 
         self.parse_query = None
