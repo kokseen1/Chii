@@ -51,7 +51,7 @@ class Chii:
 
         self.parse_query = None
         self.craft_message = None
-        self.get_image = lambda: None
+        self.get_image = lambda x: None
         self.get_key = None
 
         self.bot = telegram.Bot(bot_token)
@@ -121,7 +121,7 @@ class Chii:
             db[chat_id] = user_db
             self._write_db(db)
 
-    def _send(self, chat_id, result) -> bool:
+    def _send(self, chat_id, result):
         """
         Send a message or image with caption based on whether the
         `get_image` callback is set
