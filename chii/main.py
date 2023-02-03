@@ -13,26 +13,22 @@ def _send_message(bot, chat_id, message):
     Send a message without throwing
     """
 
-    try:
-        bot.send_message(
-            chat_id,
-            message,
-            parse_mode=telegram.ParseMode.MARKDOWN,
-        )
-    except Exception as e:
-        print(f"[TELEGRAM EXCEPTION] {e}")
+    bot.send_message(
+        chat_id,
+        message,
+        parse_mode=telegram.ParseMode.MARKDOWN,
+    )
+
 
 
 def _send_image(bot, chat_id, message, image_url):
-    try:
-        bot.send_photo(
-            chat_id,
-            photo=requests.get(image_url).content,
-            caption=message,
-            parse_mode=telegram.ParseMode.MARKDOWN,
-        )
-    except Exception as e:
-        print(f"[TELEGRAM EXCEPTION] {e}")
+    bot.send_photo(
+        chat_id,
+        photo=requests.get(image_url).content,
+        caption=message,
+        parse_mode=telegram.ParseMode.MARKDOWN,
+    )
+
 
 
 def _get_message_data(update):
@@ -125,7 +121,7 @@ class Chii:
             db[chat_id] = user_db
             self._write_db(db)
 
-    def _send(self, chat_id, result):
+    def _send(self, chat_id, result) -> bool:
         """
         Send a message or image with caption based on whether the
         `get_image` callback is set
@@ -133,14 +129,20 @@ class Chii:
 
         message = self.craft_message(result)
         if message is None:
-            return
+            return False
 
         image_url = self.get_image(result)
 
-        if image_url is not None:
-            _send_image(self.bot, chat_id, message, image_url)
-        else:
-            _send_message(self.bot, chat_id, message)
+        try:
+            if image_url is not None:
+                _send_image(self.bot, chat_id, message, image_url)
+            else:
+                _send_message(self.bot, chat_id, message)
+        except Exception as e:
+            print(f"Exception when sending: {e}")
+            return False
+        
+        return True
 
     def _poller(self, context=None, target_chat_id=None):
 
@@ -165,9 +167,9 @@ class Chii:
                     if key is None or key in queried:
                         continue
 
-                    self._send(chat_id, result)
-
-                    queried.append(key)
+                    # Store only if message was sent successfully
+                    if self._send(chat_id, result) == True:
+                        queried.append(key)
 
             with self.lock:
                 db = self._get_db()
